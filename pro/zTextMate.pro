@@ -18,13 +18,15 @@ TEMPLATE = app
 
 SOURCES += \
     ../src/main.cpp\
-    ../src/mainwindow.cpp
+    ../src/mainwindow.cpp \
+    ../src/ztextedit.cpp
 
 INCLUDEPATH += \
     ../include
 
 HEADERS  += \
-    ../include/mainwindow.h
+    ../include/mainwindow.h \
+    ../include/ztextedit.h
 
 FORMS    += \
     ../ui/mainwindow.ui
