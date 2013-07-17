@@ -6,3 +6,4 @@ ui_*.h
 *.pro.user
 tmp/*
 pro/Makefile
+test/Makefile

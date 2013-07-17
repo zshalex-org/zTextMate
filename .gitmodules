@@ -1,0 +1,3 @@
+[submodule "qtest-plus"]
+	path = qtest-plus
+	url = git@github.com:zshalex/qtest-plus.git
