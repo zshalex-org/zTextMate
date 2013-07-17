@@ -22,9 +22,9 @@ SOURCES += \
 
 INCLUDEPATH += \
     ../include \
-    ../include/qtest-plus
+    ../qtest-plus/include
 
-LIBS += ../lib/libqtest-plus.dylib
+LIBS += ../qtest-plus/lib/libqtest-plus.dylib
 
 include(../pro/zTextMate.pri)
 include(test.pri)
