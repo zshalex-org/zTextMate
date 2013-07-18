@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->mainToolBar->hide();
+    ui->textEdit->setBackground(QColor("#200020"));
 }
 
 MainWindow::~MainWindow()

@@ -8,6 +8,8 @@ class ZTextEdit : public QTextEdit
     Q_OBJECT
 public:
     explicit ZTextEdit(QWidget *parent = 0);
+
+    void setBackground(QColor color);
     
 signals:
     

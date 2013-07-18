@@ -28,7 +28,11 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="ZTextEdit" name="textEdit"/>
+     <widget class="ZTextEdit" name="textEdit">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
