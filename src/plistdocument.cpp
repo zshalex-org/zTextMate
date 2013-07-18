@@ -1,5 +1,6 @@
 #include <QFile>
 #include <QDebug>
+#include <QDateTime>
 
 #include "plistdocument.h"
 
@@ -88,9 +89,27 @@ bool PListDocument::loadDict(QDomElement &element, PListDict &dict)
             result = loadArray(value,array);
             if (result)
                 dict.insert(key,array);
+        } else if (type == INTEGER_NODE) {
+            int i;
+            result = loadInteger(value, i);
+            if(result)
+                dict.insert(key,i);
+        } else if (type == REAL_NODE) {
+            float f;
+            result = loadReal(value, f);
+            if(result)
+                dict.insert(key,f);
+        } else if (type == DATE_NODE) {
+            QDateTime date;
+            result = loadDate(value, date);
+            if(result)
+                dict.insert(key,date);
+        } else if (type == DATA_NODE) {
+            QByteArray data;
+            result = loadData(value, data);
+            if(result)
+                dict.insert(key,data);
         }
-
-
         n = n.nextSiblingElement(KEY_NODE);
     }
     return true;
@@ -115,11 +134,37 @@ bool PListDocument::loadArray(QDomElement &element, PListArray &list)
             result = loadString(n,str);
             if (result)
                 list.append(str);
-         } else if (type == DICT_NODE) {
+        } else if (type == DICT_NODE) {
             PListDict dict;
             result = loadDict(n,dict);
             if (result)
                 list.append(dict);
+        } else if (type == ARRAY_NODE) {
+            PListArray array;
+            result = loadArray(n,array);
+            if (result)
+                list.append(array);
+        } else if (type == INTEGER_NODE) {
+            int i;
+            result = loadInteger(n, i);
+            if(result)
+                list.append(i);
+        } else if (type == REAL_NODE) {
+            float f;
+            result = loadReal(n, f);
+            if(result)
+                list.append(f);
+        } else if (type == DATE_NODE) {
+            QDateTime date;
+            result = loadDate(n, date);
+            if(result)
+                list.append(date);
+        }
+        else if (type == DATA_NODE) {
+            QByteArray data;
+            result = loadData(n, data);
+            if(result)
+                list.append(data);
         }
         n = n.nextSiblingElement();
     }
@@ -131,6 +176,39 @@ bool PListDocument::loadString(QDomElement &element, QString &string)
     if (element.isNull() || element.nodeName() != STRING_NODE)
         return false;
     string = element.firstChild().nodeValue();
+    return true;
+}
+
+bool PListDocument::loadInteger(QDomElement &element, int &value)
+{
+    if (element.isNull() || element.nodeName() != STRING_NODE)
+        return false;
+    value = element.firstChild().nodeValue().toInt();
+    return true;
+}
+
+bool PListDocument::loadReal(QDomElement &element, float &value)
+{
+    if (element.isNull() || element.nodeName() != STRING_NODE)
+        return false;
+    value = element.firstChild().nodeValue().toFloat();
+    return true;
+}
+
+bool PListDocument::loadDate(QDomElement &element, QDateTime &date)
+{
+    if (element.isNull() || element.nodeName() != STRING_NODE)
+        return false;
+    date = QDateTime::fromString(element.firstChild().nodeValue(),"yyyy-MM-dd hh:mm:ss");
+    return true;
+}
+
+bool PListDocument::loadData(QDomElement &element, QByteArray &data)
+{
+    if (element.isNull() || element.nodeName() != STRING_NODE)
+        return false;
+    data = QByteArray::fromBase64(
+                element.firstChild().nodeValue().toAscii());
     return true;
 }
 
