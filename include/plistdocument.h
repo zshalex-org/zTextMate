@@ -42,6 +42,8 @@ public:
     ~PListDocument();
 
     const QVariant & root() const;
+    QVariant getValue(QString key);
+    QVariant getValue(const QVariant &node, QString key);
 
     void setRoot(const QVariant &root);
 
@@ -57,6 +59,8 @@ private:
     bool loadReal(const QDomElement &element, qreal &value);
     bool loadDate(const QDomElement &element, QDateTime &date);
     bool loadData(const QDomElement &element, QByteArray &data);
+
+    void getKeyAndIndex(QString node, QString &key, int &index);
 private:
     static QStringList m_nodeMap;
     PListDict m_dict;

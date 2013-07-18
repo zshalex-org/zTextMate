@@ -12,6 +12,11 @@ QStringList PListDocument::m_nodeMap(
 PListDocument::PListDocument(QObject *parent) :
     QObject(parent)
 {
+    QString tmp = "sdfsdf[3]";
+    QString key;
+    int index;
+    getKeyAndIndex(tmp,key,index);
+    qDebug() << key << index;
 }
 
 PListDocument::~PListDocument()
@@ -23,6 +28,39 @@ const QVariant &PListDocument::root() const
 {
     return m_root;
 }
+
+QVariant PListDocument::getValue(QString key)
+{
+    return getValue(m_root,key);
+}
+
+QVariant PListDocument::getValue(const QVariant &node, QString key)
+{
+    QVariant result;
+    QStringList keys = key.split(".");
+    QString subKey = "";
+    qDebug() << keys;
+    if (keys.count() == 0)
+        return result;
+    if (keys.count() >= 1) {
+        qDebug() << node.typeName();
+        if (QString(node.typeName()) == "QVariantMap") {
+            PListDict dict = node.value<QVariantMap>();
+            result = dict.value(keys.at(0));
+        } else if (QString(node.typeName()) == "QVariantList") {
+//            int begin = keys.at(0)
+
+        } else {
+            return result;
+        }
+    }
+    if (keys.count() > 1){
+        subKey = key.right(key.count() - keys.at(0).count() - 1);
+        result = getValue(result, subKey);
+    }
+    return result;
+}
+
 
 void PListDocument::setRoot(const QVariant &root)
 {
@@ -51,7 +89,7 @@ bool PListDocument::load(const QString &filename)
 
     m_root = loadValue(element);
 
-    return !m_root.isNull();
+    return m_root.isValid();
 }
 
 bool PListDocument::save(const QString &)
@@ -65,7 +103,6 @@ QVariant PListDocument::loadValue(const QDomElement &element)
     if (element.isNull())
         return result;
     QString type = element.nodeName();
-
     switch(m_nodeMap.indexOf(type)) {
     case DICT_NODE: {
         PListDict dict;
@@ -119,8 +156,9 @@ QVariant PListDocument::loadValue(const QDomElement &element)
 
 bool PListDocument::loadDict(const QDomElement &element, PListDict &dict)
 {
-    if (element.isNull() || element.nodeName() != DICT_NODE_NAME)
+    if (element.isNull() || element.nodeName() != DICT_NODE_NAME) {
         return false;
+    }
 
     QDomElement n = element.firstChildElement(KEY_NODE_NAME);
     QVariant var;
@@ -128,11 +166,13 @@ bool PListDocument::loadDict(const QDomElement &element, PListDict &dict)
     dict.clear();
     while (!n.isNull()) {
         value = n.nextSiblingElement();
-        if (value.isNull())
+        if (value.isNull()) {
             return false;
+        }
         var = loadValue(value);
-        if (var.isNull())
+        if (!var.isValid()) {
             return false;
+        }
         dict.insert(n.firstChild().nodeValue(),
                     var);
         n = n.nextSiblingElement(KEY_NODE_NAME);
@@ -150,7 +190,7 @@ bool PListDocument::loadArray(const QDomElement &element, PListArray &list)
     QVariant var;
     while (!n.isNull()) {
         var = loadValue(n);
-        if (var.isNull())
+        if (!var.isValid())
             return false;
         list.append(var);
         n = n.nextSiblingElement();
@@ -160,41 +200,60 @@ bool PListDocument::loadArray(const QDomElement &element, PListArray &list)
 
 bool PListDocument::loadString(const QDomElement &element, QString &string)
 {
-    if (element.isNull() || element.nodeName() != STRING_NODE_NAME)
+    if (element.isNull() || element.nodeName() != STRING_NODE_NAME) {
         return false;
+    }
     string = element.firstChild().nodeValue();
     return true;
 }
 
 bool PListDocument::loadInteger(const QDomElement &element, int &value)
 {
-    if (element.isNull() || element.nodeName() != INTEGER_NODE_NAME)
+    if (element.isNull() || element.nodeName() != INTEGER_NODE_NAME) {
         return false;
+    }
     value = element.firstChild().nodeValue().toInt();
     return true;
 }
 
 bool PListDocument::loadReal(const QDomElement &element, qreal &value)
 {
-    if (element.isNull() || element.nodeName() != REAL_NODE_NAME)
+    if (element.isNull() || element.nodeName() != REAL_NODE_NAME) {
         return false;
+    }
     value = element.firstChild().nodeValue().toDouble();
     return true;
 }
 
 bool PListDocument::loadDate(const QDomElement &element, QDateTime &date)
 {
-    if (element.isNull() || element.nodeName() != DATE_NODE_NAME)
+    if (element.isNull() || element.nodeName() != DATE_NODE_NAME) {
         return false;
+    }
     date = QDateTime::fromString(element.firstChild().nodeValue(),"yyyy-MM-dd hh:mm:ss");
     return true;
 }
 
 bool PListDocument::loadData(const QDomElement &element, QByteArray &data)
 {
-    if (element.isNull() || element.nodeName() != DATA_NODE_NAME)
+    if (element.isNull() || element.nodeName() != DATA_NODE_NAME) {
         return false;
+    }
     data = QByteArray::fromBase64(
                 element.firstChild().nodeValue().toLatin1());
     return true;
+}
+
+void PListDocument::getKeyAndIndex(QString node, QString &key, int &index)
+{
+    QString tmp = node.section("[",1);
+    if (!tmp.endsWith("]"))
+        return;
+    QString indexStr = tmp.remove("]");
+    bool ok;
+    int tmpIndex = indexStr.toInt(&ok);
+    if (ok)
+        index = tmpIndex;
+
+    key = node.left(node.count() - indexStr.count() - 2);
 }
