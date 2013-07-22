@@ -1,6 +1,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QDateTime>
+#include <QRegExp>
 
 #include "plistdocument.h"
 
@@ -12,11 +13,6 @@ QStringList PListDocument::m_nodeMap(
 PListDocument::PListDocument(QObject *parent) :
     QObject(parent)
 {
-    QString tmp = "sdfsdf[3]";
-    QString key;
-    int index;
-    getKeyAndIndex(tmp,key,index);
-    qDebug() << key << index;
 }
 
 PListDocument::~PListDocument()
@@ -34,28 +30,36 @@ QVariant PListDocument::getValue(QString key)
     return getValue(m_root,key);
 }
 
-QVariant PListDocument::getValue(const QVariant &node, QString key)
+QVariant PListDocument::getValue(const QVariant &node, QString finder)
 {
     QVariant result;
-    QStringList keys = key.split(".");
+
+    if (!node.isValid() || finder.isEmpty())
+        return result;
+
+    QString type(node.typeName());
+
+    if (type != "QVariantMap" ||
+           type != "QVariantList")
+        return result;
+
+    QStringList keys = finder.split(".");
     QString subKey = "";
-    qDebug() << keys;
     if (keys.count() == 0)
         return result;
-    if (keys.count() >= 1) {
-        qDebug() << node.typeName();
-        if (QString(node.typeName()) == "QVariantMap") {
-            PListDict dict = node.value<QVariantMap>();
-            result = dict.value(keys.at(0));
-        } else if (QString(node.typeName()) == "QVariantList") {
-//            int begin = keys.at(0)
+    QString key = keys.at(0);
 
-        } else {
-            return result;
-        }
+    if (isArray(key)) {
+        int index = -1;
+        splitKeyAndIndex(key,subKey,index);
+        result = getVarFromDict(node,subKey);
+        result = getVarFromArray(result,index);
+    } else {
+        result = getVarFromDict(node,key);
     }
+
     if (keys.count() > 1){
-        subKey = key.right(key.count() - keys.at(0).count() - 1);
+        subKey = finder.section(".",1);
         result = getValue(result, subKey);
     }
     return result;
@@ -244,16 +248,46 @@ bool PListDocument::loadData(const QDomElement &element, QByteArray &data)
     return true;
 }
 
-void PListDocument::getKeyAndIndex(QString node, QString &key, int &index)
+QVariant PListDocument::getVarFromDict(QVariant node, QString key)
 {
-    QString tmp = node.section("[",1);
-    if (!tmp.endsWith("]"))
-        return;
-    QString indexStr = tmp.remove("]");
-    bool ok;
-    int tmpIndex = indexStr.toInt(&ok);
-    if (ok)
-        index = tmpIndex;
+    QVariant var;
+    if (QString(node.typeName()) != "QVariantMap" ||
+            key.isEmpty())
+        return var;
+    QVariantMap dict = node.value<QVariantMap>();
+    return dict.value(key);
+}
 
-    key = node.left(node.count() - indexStr.count() - 2);
+QVariant PListDocument::getVarFromArray(QVariant node, int index)
+{
+    QVariant var;
+    if (QString(node.typeName()) != "QVariantList" ||
+            index < 0)
+        return var;
+    QVariantList array = node.value<QVariantList>();
+    return array.at(index);
+}
+
+bool PListDocument::splitKeyAndIndex(QString node, QString &key, int &index)
+{
+    bool result = isArray(node);
+    if (!result) {
+        key = "";
+        index = -1;
+        return result;
+    }
+
+    QRegExp exp("\\w+");
+    QString num = node.section(exp,1);
+    key = node.remove(num);
+    num = num.remove("[");
+    num = num.remove("]");
+    index = num.toInt();
+    return true;
+}
+
+bool PListDocument::isArray(QString node)
+{
+    QRegExp exp("\\w+\\[\\d+\\]");
+    return exp.exactMatch(node);
 }

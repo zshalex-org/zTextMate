@@ -9,7 +9,11 @@ class PListDocumentTest : public TestCase
 public:
     DECLARE_TEST_CASE(PListDocumentTest);
 private slots:
-    void test();
+    void testIsArray();
+    void testIsArray_data();
+    void testSplitNode();
+    void testSplitNode_data();
+    void testGetDict();
 };
 
 #endif // PLISTDOCUMENTTEST_H
