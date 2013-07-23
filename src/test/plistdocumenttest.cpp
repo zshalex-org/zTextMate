@@ -55,7 +55,7 @@ void PListDocumentTest::testSplitNode_data()
 void PListDocumentTest::testGetDict()
 {
     PListDocument doc;
-    QCOMPARE(doc.load("Amy.tmTheme"),true);
+    QCOMPARE(doc.load("Amy.xml"),true);
     QVariant var = doc.getValue("name");
     QCOMPARE(var.toString(),QString("Amy"));
     var = doc.getValue("settings");
@@ -67,13 +67,20 @@ void PListDocumentTest::testGetDict()
 void PListDocumentTest::testColorsCheme()
 {
     ColorScheme scheme;
+    SubScheme value;
 
-    bool result = scheme.loadColorScheme("Amy.tmTheme");
+    bool result = scheme.loadColorScheme("Amy.xml");
+    value = scheme.scheme("comment.block");
     QCOMPARE(result,true);
+    QCOMPARE(scheme.name(),QString("Amy"));
     QCOMPARE(scheme.background(),QString("#200020"));
-    QVariant var = scheme.getDict("comment.block");
-    QCOMPARE(PListDocument::getValue(var,"name").toString(),
-             QString("Comment"));
-    QCOMPARE(PListDocument::getValue(var,"scope").toString(),
-             QString("comment.block"));
+    QCOMPARE(scheme.caret(),QString("#7070FF"));
+    QCOMPARE(value.name,QString("Comment"));
+    QCOMPARE(value.scope,QString("comment.block"));
+    QCOMPARE(value.background,QString("#200020"));
+    QCOMPARE(value.fontStyle,QString("italic"));
+    QCOMPARE(value.foreground,QString("#404080"));
+
+    value = scheme.scheme("string");
+    QCOMPARE(value.foreground,QString("#999999"));
 }

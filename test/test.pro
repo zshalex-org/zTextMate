@@ -23,8 +23,12 @@ SOURCES += \
 INCLUDEPATH += \
     ../include \
     ../qtest-plus/include
-
+macx {
 LIBS += ../qtest-plus/lib/libqtest-plus.dylib
+}
+win32 {
+LIBS += ../qtest-plus/lib/libqtest-plus0.a
+}
 
 include(../pro/zTextMate.pri)
 include(test.pri)

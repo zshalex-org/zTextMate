@@ -7,6 +7,15 @@
 
 #include "plistdocument.h"
 
+struct SubScheme
+{
+    QString name;
+    QString scope;
+    QString background;
+    QString foreground;
+    QString fontStyle;
+};
+
 class ColorScheme : public QObject
 {
     Q_OBJECT
@@ -23,13 +32,21 @@ public:
     QString lineHighLight();
     QString selection();
 
-    QVariant getDict(QString key);
     bool loadColorScheme(QString filename);
+    SubScheme scheme(QString key);
 
 private:
-    PListDocument m_plist;
-    PListDict m_map;
+    QMap<QString,SubScheme> m_map;
     bool m_result;
+    QString m_name;
+    QString m_author;
+    QString m_uuid;
+    QString m_background;
+    QString m_caret;
+    QString m_foreground;
+    QString m_invisibles;
+    QString m_lineHighLight;
+    QString m_selection;
 };
 
 #endif // COLORSCHEME_H
