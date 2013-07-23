@@ -1,8 +1,9 @@
-#include "test/plistdocumenttest.h"
-#include "plistdocument.h"
-
 #include <QRegExp>
 #include <QDebug>
+
+#include "test/plistdocumenttest.h"
+#include "plistdocument.h"
+#include "colorscheme.h"
 
 INIT_TEST_CASE(PListDocumentTest,"plsitTest");
 
@@ -60,6 +61,19 @@ void PListDocumentTest::testGetDict()
     var = doc.getValue("settings");
     QCOMPARE(QString(var.typeName()),QString("QVariantList"));
     var = doc.getValue("settings[0].settings.background");
-    qDebug() << var;
     QCOMPARE(var.toString(),QString("#200020"));
+}
+
+void PListDocumentTest::testColorsCheme()
+{
+    ColorScheme scheme;
+
+    bool result = scheme.loadColorScheme("Amy.tmTheme");
+    QCOMPARE(result,true);
+    QCOMPARE(scheme.background(),QString("#200020"));
+    QVariant var = scheme.getDict("comment.block");
+    QCOMPARE(PListDocument::getValue(var,"name").toString(),
+             QString("Comment"));
+    QCOMPARE(PListDocument::getValue(var,"scope").toString(),
+             QString("comment.block"));
 }

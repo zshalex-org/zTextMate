@@ -14,6 +14,7 @@ private slots:
     void testSplitNode();
     void testSplitNode_data();
     void testGetDict();
+    void testColorsCheme();
 };
 
 #endif // PLISTDOCUMENTTEST_H

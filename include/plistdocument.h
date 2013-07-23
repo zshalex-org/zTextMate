@@ -43,15 +43,15 @@ public:
 
     const QVariant & root() const;
     QVariant getValue(QString key);
-    QVariant getValue(const QVariant &node, QString finder);
+    static QVariant getValue(const QVariant &node, QString finder);
 
     void setRoot(const QVariant &root);
 
     bool load(const QString &filename);
     bool save(const QString &filename);
 
-    bool isArray(QString node);
-    bool splitKeyAndIndex(QString node, QString &key, int &index);
+    static bool isArray(QString node);
+    static bool splitKeyAndIndex(QString node, QString &key, int &index);
 private:
     QVariant loadValue(const QDomElement &element);
 
@@ -63,8 +63,8 @@ private:
     bool loadDate(const QDomElement &element, QDateTime &date);
     bool loadData(const QDomElement &element, QByteArray &data);
 
-    QVariant getVarFromDict(QVariant node, QString key);
-    QVariant getVarFromArray(QVariant node, int index);
+    static QVariant getVarFromDict(QVariant node, QString key);
+    static QVariant getVarFromArray(QVariant node, int index);
 private:
     static QStringList m_nodeMap;
     PListDict m_dict;

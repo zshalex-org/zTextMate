@@ -24,7 +24,7 @@ public:
     QString selection();
 
     QVariant getDict(QString key);
-    bool loadColorScheme(QString &filename);
+    bool loadColorScheme(QString filename);
 
 private:
     PListDocument m_plist;

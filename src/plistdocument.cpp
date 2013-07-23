@@ -39,7 +39,7 @@ QVariant PListDocument::getValue(const QVariant &node, QString finder)
 
     QString type(node.typeName());
 
-    if (type != "QVariantMap" ||
+    if (type != "QVariantMap" &&
            type != "QVariantList")
         return result;
 
