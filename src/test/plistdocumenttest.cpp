@@ -73,14 +73,14 @@ void PListDocumentTest::testColorsCheme()
     value = scheme.scheme("comment.block");
     QCOMPARE(result,true);
     QCOMPARE(scheme.name(),QString("Amy"));
-    QCOMPARE(scheme.background(),QString("#200020"));
-    QCOMPARE(scheme.caret(),QString("#7070FF"));
+    QCOMPARE(scheme.background(),QColor("#200020"));
+    QCOMPARE(scheme.caret(),QColor("#7070FF"));
     QCOMPARE(value.name,QString("Comment"));
     QCOMPARE(value.scope,QString("comment.block"));
-    QCOMPARE(value.background,QString("#200020"));
+    QCOMPARE(value.background,QColor("#200020"));
     QCOMPARE(value.fontStyle,QString("italic"));
-    QCOMPARE(value.foreground,QString("#404080"));
+    QCOMPARE(value.foreground,QColor("#404080"));
 
     value = scheme.scheme("string");
-    QCOMPARE(value.foreground,QString("#999999"));
+    QCOMPARE(value.foreground,QColor("#999999"));
 }

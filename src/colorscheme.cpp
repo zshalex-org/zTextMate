@@ -1,52 +1,67 @@
 #include "colorscheme.h"
 
+#define COLOR_SCHEME_NAME              "name"
+#define COLOR_SCHEME_AUTHOR            "author"
+#define COLOR_SCHEME_UUID              "uuid"
+#define COLOR_SCHEME_SETTINGS          "settings"
+#define COLOR_SCHEME_DEF_BACKGROUND    "settings[0].settings.background"
+#define COLOR_SCHEME_DEF_CARET         "settings[0].settings.caret"
+#define COLOR_SCHEME_DEF_FOREGROUND    "settings[0].settings.foreground"
+#define COLOR_SCHEME_DEF_INVISIBLES    "settings[0].settings.invisibles"
+#define COLOR_SCHEME_DEF_LINEHIGHLIGHT "settings[0].settings.lineHighLight"
+#define COLOR_SCHEME_DEF_SELECTION     "settings[0].settings.selection"
+#define COLOR_SCHEME_SUB_SCOPE         "scope"
+#define COLOR_SCHEME_SUB_FONT_STYLE    "fontStyle"
+#define COLOR_SCHEME_SUB_COMMENT_BLOCK "comment.block"
+#define COLOR_SCHEME_SUB_BACKGROUND    "background"
+#define COLOR_SCHEME_SUB_FOREGROUND    "foreground"
+
 ColorScheme::ColorScheme(QObject *parent) :
-    QObject(parent),
-    m_result(false)
+    QObject(parent)
 {
 }
 
-QString ColorScheme::name()
+const QString & ColorScheme::name() const
 {
     return m_name;
 }
 
-QString ColorScheme::author()
+const QString & ColorScheme::author() const
 {
     return m_author;
 }
 
-QString ColorScheme::uuid()
+const QString & ColorScheme::uuid() const
 {
     return m_uuid;
 }
 
-QString ColorScheme::background()
+const QColor & ColorScheme::background() const
 {
     return m_background;
 }
 
-QString ColorScheme::caret()
+const QColor & ColorScheme::caret() const
 {
     return m_caret;
 }
 
-QString ColorScheme::foreground()
+const QColor & ColorScheme::foreground() const
 {
     return m_foreground;
 }
 
-QString ColorScheme::invisibles()
+const QColor & ColorScheme::invisibles() const
 {
     return m_invisibles;
 }
 
-QString ColorScheme::lineHighLight()
+const QColor & ColorScheme::lineHighLight() const
 {
     return m_lineHighLight;
 }
 
-QString ColorScheme::selection()
+const QColor & ColorScheme::selection() const
 {
     return m_selection;
 }
@@ -57,41 +72,43 @@ bool ColorScheme::loadColorScheme(QString filename)
     bool result = plist.load(filename);
     m_map.clear();
     if (result) {
-        m_name = plist.getValue("name").toString();
-        m_author = plist.getValue("author").toString();
-        m_uuid = plist.getValue("uuid").toString();
+        m_name = plist.getValue(COLOR_SCHEME_NAME).toString();
+        m_author = plist.getValue(COLOR_SCHEME_AUTHOR).toString();
+        m_uuid = plist.getValue(COLOR_SCHEME_UUID).toString();
+
         m_background = plist.getValue(
-                    "settings[0].settings.background").toString();
+                    COLOR_SCHEME_DEF_BACKGROUND).value<QColor>();
         m_caret = plist.getValue(
-                    "settings[0].settings.caret").toString();
+                    COLOR_SCHEME_DEF_CARET).value<QColor>();
         m_foreground = plist.getValue(
-                    "settings[0].settings.foreground").toString();
+                    COLOR_SCHEME_DEF_FOREGROUND).value<QColor>();
         m_invisibles = plist.getValue(
-                    "settings[0].settings.invisibles").toString();
+                    COLOR_SCHEME_DEF_INVISIBLES).value<QColor>();
         m_lineHighLight = plist.getValue(
-                    "settings[0].settings.lineHighLight").toString();
+                    COLOR_SCHEME_DEF_LINEHIGHLIGHT).value<QColor>();
         m_selection = plist.getValue(
-                    "settings[0].settings.selection").toString();
-        QVariant value = plist.getValue("settings");
+                    COLOR_SCHEME_DEF_SELECTION).value<QColor>();
+
+        QVariant value = plist.getValue(COLOR_SCHEME_SETTINGS);
         PListArray array = value.value<PListArray>();
         SubScheme scheme;
 
         for (int i = 0; i < array.count(); i++) {
-            value = plist.getValue(array.at(i),"name");
+            value = plist.getValue(array.at(i),COLOR_SCHEME_NAME);
             if (!value.isValid())
                 continue;
             scheme.name = value.toString();
-            value = plist.getValue(array.at(i),"scope");
+            value = plist.getValue(array.at(i),COLOR_SCHEME_SUB_SCOPE);
             scheme.scope = value.toString();
-            value = plist.getValue(array.at(i),"settings");
-            if(scheme.scope == "comment.block"){
-                scheme.background = plist.getValue(value, "background")
-                        .toString();
-                scheme.fontStyle = plist.getValue(value, "fontStyle")
+            value = plist.getValue(array.at(i),COLOR_SCHEME_SETTINGS);
+            if(scheme.scope == COLOR_SCHEME_SUB_COMMENT_BLOCK){
+                scheme.background = plist.getValue(value, COLOR_SCHEME_SUB_BACKGROUND)
+                        .value<QColor>();
+                scheme.fontStyle = plist.getValue(value, COLOR_SCHEME_SUB_FONT_STYLE)
                         .toString();
             }
-            scheme.foreground = plist.getValue(value, "foreground")
-                    .toString();
+            scheme.foreground = plist.getValue(value, COLOR_SCHEME_SUB_FOREGROUND)
+                    .value<QColor>();
             m_map.insert(scheme.scope, scheme);
         }
     }

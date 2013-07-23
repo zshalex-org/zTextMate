@@ -11,8 +11,8 @@ struct SubScheme
 {
     QString name;
     QString scope;
-    QString background;
-    QString foreground;
+    QColor background;
+    QColor foreground;
     QString fontStyle;
 };
 
@@ -22,31 +22,29 @@ class ColorScheme : public QObject
 public:
     explicit ColorScheme(QObject *parent = 0);
 
-    QString name();
-    QString author();
-    QString uuid();
-    QString background();
-    QString caret();
-    QString foreground();
-    QString invisibles();
-    QString lineHighLight();
-    QString selection();
+    const QString & name() const;
+    const QString & author() const;
+    const QString & uuid() const;
+    const QColor & background() const;
+    const QColor & caret() const;
+    const QColor & foreground() const;
+    const QColor & invisibles() const;
+    const QColor & lineHighLight() const;
+    const QColor & selection() const;
 
     bool loadColorScheme(QString filename);
     SubScheme scheme(QString key);
-
 private:
     QMap<QString,SubScheme> m_map;
-    bool m_result;
     QString m_name;
     QString m_author;
     QString m_uuid;
-    QString m_background;
-    QString m_caret;
-    QString m_foreground;
-    QString m_invisibles;
-    QString m_lineHighLight;
-    QString m_selection;
+    QColor m_background;
+    QColor m_caret;
+    QColor m_foreground;
+    QColor m_invisibles;
+    QColor m_lineHighLight;
+    QColor m_selection;
 };
 
 #endif // COLORSCHEME_H
