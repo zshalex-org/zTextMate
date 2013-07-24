@@ -1,4 +1,5 @@
 #include "colorscheme.h"
+#include "plistdocument.h"
 
 #define COLOR_SCHEME_NAME              "name"
 #define COLOR_SCHEME_AUTHOR            "author"
@@ -11,10 +12,9 @@
 #define COLOR_SCHEME_DEF_LINEHIGHLIGHT "settings[0].settings.lineHighLight"
 #define COLOR_SCHEME_DEF_SELECTION     "settings[0].settings.selection"
 #define COLOR_SCHEME_SUB_SCOPE         "scope"
-#define COLOR_SCHEME_SUB_FONT_STYLE    "fontStyle"
-#define COLOR_SCHEME_SUB_COMMENT_BLOCK "comment.block"
-#define COLOR_SCHEME_SUB_BACKGROUND    "background"
-#define COLOR_SCHEME_SUB_FOREGROUND    "foreground"
+#define COLOR_SCHEME_SUB_FONT_STYLE    "settings.fontStyle"
+#define COLOR_SCHEME_SUB_BACKGROUND    "settings.background"
+#define COLOR_SCHEME_SUB_FOREGROUND    "settings.foreground"
 
 ColorScheme::ColorScheme(QObject *parent) :
     QObject(parent)
@@ -72,43 +72,30 @@ bool ColorScheme::loadColorScheme(QString filename)
     bool result = plist.load(filename);
     m_map.clear();
     if (result) {
-        m_name = plist.getValue(COLOR_SCHEME_NAME).toString();
-        m_author = plist.getValue(COLOR_SCHEME_AUTHOR).toString();
-        m_uuid = plist.getValue(COLOR_SCHEME_UUID).toString();
+        m_name = plist.getString(COLOR_SCHEME_NAME);
+        m_author = plist.getString(COLOR_SCHEME_AUTHOR);
+        m_uuid = plist.getString(COLOR_SCHEME_UUID);
 
-        m_background = plist.getValue(
-                    COLOR_SCHEME_DEF_BACKGROUND).value<QColor>();
-        m_caret = plist.getValue(
-                    COLOR_SCHEME_DEF_CARET).value<QColor>();
-        m_foreground = plist.getValue(
-                    COLOR_SCHEME_DEF_FOREGROUND).value<QColor>();
-        m_invisibles = plist.getValue(
-                    COLOR_SCHEME_DEF_INVISIBLES).value<QColor>();
-        m_lineHighLight = plist.getValue(
-                    COLOR_SCHEME_DEF_LINEHIGHLIGHT).value<QColor>();
-        m_selection = plist.getValue(
-                    COLOR_SCHEME_DEF_SELECTION).value<QColor>();
+        m_background = plist.getColor(COLOR_SCHEME_DEF_BACKGROUND);
+        m_caret = plist.getColor(COLOR_SCHEME_DEF_CARET);
+        m_foreground = plist.getColor(COLOR_SCHEME_DEF_FOREGROUND);
+        m_invisibles = plist.getColor(COLOR_SCHEME_DEF_INVISIBLES);
+        m_lineHighLight = plist.getColor(COLOR_SCHEME_DEF_LINEHIGHLIGHT);
+        m_selection = plist.getColor(COLOR_SCHEME_DEF_SELECTION);
 
         QVariant value = plist.getValue(COLOR_SCHEME_SETTINGS);
         PListArray array = value.value<PListArray>();
         SubScheme scheme;
 
         for (int i = 0; i < array.count(); i++) {
-            value = plist.getValue(array.at(i),COLOR_SCHEME_NAME);
-            if (!value.isValid())
-                continue;
-            scheme.name = value.toString();
-            value = plist.getValue(array.at(i),COLOR_SCHEME_SUB_SCOPE);
-            scheme.scope = value.toString();
-            value = plist.getValue(array.at(i),COLOR_SCHEME_SETTINGS);
-            if(scheme.scope == COLOR_SCHEME_SUB_COMMENT_BLOCK){
-                scheme.background = plist.getValue(value, COLOR_SCHEME_SUB_BACKGROUND)
-                        .value<QColor>();
-                scheme.fontStyle = plist.getValue(value, COLOR_SCHEME_SUB_FONT_STYLE)
-                        .toString();
-            }
-            scheme.foreground = plist.getValue(value, COLOR_SCHEME_SUB_FOREGROUND)
-                    .value<QColor>();
+            scheme.name = plist.getString(array.at(i),COLOR_SCHEME_NAME);
+            scheme.scope = plist.getString(array.at(i),COLOR_SCHEME_SUB_SCOPE);
+            scheme.background = plist.getColor(array.at(i), COLOR_SCHEME_SUB_BACKGROUND);
+            scheme.fontStyle = plist.getString(array.at(i), COLOR_SCHEME_SUB_FONT_STYLE);
+            scheme.foreground = plist.getColor(array.at(i), COLOR_SCHEME_SUB_FOREGROUND);
+
+            scheme.italic = scheme.fontStyle == "italic";
+            scheme.underline = scheme.fontStyle == "underline";
             m_map.insert(scheme.scope, scheme);
         }
     }

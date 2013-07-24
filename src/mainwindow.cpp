@@ -12,13 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->mainToolBar->hide();
     ui->textEdit->setBackground(QColor("#200020"));
 
-    PListDocument doc;
+//    PListDocument doc;
 
-    qDebug() << doc.load("Amy.tmTheme");
-    QVariant v = doc.getValue("settings");
-    PListArray list = v.value<PListArray>();
+//    qDebug() << doc.load("Amy.tmTheme");
+//    QVariant v = doc.getValue("settings");
+//    PListArray list = v.value<PListArray>();
 
-    qDebug() << list.at(0) << doc.getValue(list.at(0),"settings.background");
+//    qDebug() << list.at(0) << doc.getValue(list.at(0),"settings.background");
 //    << doc.root();
 }
 

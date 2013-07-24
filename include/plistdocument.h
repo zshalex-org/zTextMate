@@ -43,7 +43,12 @@ public:
 
     const QVariant & root() const;
     QVariant getValue(QString key);
+    QString getString(QString key);
+    QColor getColor(QString key);
+
     static QVariant getValue(const QVariant &node, QString finder);
+    static QString getString(const QVariant &node, QString finder);
+    static QColor getColor(const QVariant &node, QString finder);
 
     void setRoot(const QVariant &root);
 

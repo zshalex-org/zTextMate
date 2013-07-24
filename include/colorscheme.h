@@ -2,10 +2,8 @@
 #define COLORSCHEME_H
 
 #include <QObject>
-#include <QUuid>
 #include <QColor>
-
-#include "plistdocument.h"
+#include <QMap>
 
 struct SubScheme
 {
@@ -14,6 +12,8 @@ struct SubScheme
     QColor background;
     QColor foreground;
     QString fontStyle;
+    bool italic;
+    bool underline;
 };
 
 class ColorScheme : public QObject

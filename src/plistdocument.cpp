@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QDateTime>
 #include <QRegExp>
+#include <QColor>
 
 #include "plistdocument.h"
 
@@ -28,6 +29,19 @@ const QVariant &PListDocument::root() const
 QVariant PListDocument::getValue(QString key)
 {
     return getValue(m_root,key);
+}
+
+QString PListDocument::getString(QString key)
+{
+    return getValue(key).toString();
+}
+
+QColor PListDocument::getColor(QString key)
+{
+    QString str = getString(key);
+    if (str.isEmpty())
+        return QColor();
+    return QColor(str);
 }
 
 QVariant PListDocument::getValue(const QVariant &node, QString finder)
@@ -65,6 +79,18 @@ QVariant PListDocument::getValue(const QVariant &node, QString finder)
     return result;
 }
 
+QString PListDocument::getString(const QVariant &node, QString finder)
+{
+    return getValue(node,finder).toString();
+}
+
+QColor PListDocument::getColor(const QVariant &node, QString finder)
+{
+    QString str = getString(node,finder);
+    if (str.isEmpty())
+        return QColor();
+    return QColor(str);
+}
 
 void PListDocument::setRoot(const QVariant &root)
 {
